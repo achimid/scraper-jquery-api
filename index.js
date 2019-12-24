@@ -63,7 +63,7 @@ app.post('/evaluate', (req, res) => {
 })
 
 const initBrowser = async () => {
-    browser = await puppeteer.launch();
+    browser = await puppeteer.launch({args: ['--no-sandbox', '--disable-setuid-sandbox']});
 }
 
 app.use(function(err, req, res, next) {
