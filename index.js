@@ -2,7 +2,7 @@ const express = require('express')
 const puppeteer = require('puppeteer');
 const compression = require('compression');
 
-const urlJquery = { url: 'http://code.jquery.com/jquery-3.2.1.min.js' }
+const urlJquery = { url: 'https://code.jquery.com/jquery-3.2.1.min.js' }
 const defaults = {
     script: '$("html").html()',
     importJquery: true,
