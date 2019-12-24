@@ -1,0 +1,25 @@
+{
+  "name": "scraper-jquery-api",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/achimid/scraper-jquery-api.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/achimid/scraper-jquery-api/issues"
+  },
+  "homepage": "https://github.com/achimid/scraper-jquery-api#readme",
+  "dependencies": {
+    "compression": "^1.7.4",
+    "express": "^4.17.1",
+    "express-validator": "^6.1.0",
+    "puppeteer": "^2.0.0"
+  }
+}
