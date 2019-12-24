@@ -6,12 +6,13 @@ const cache = (duration = default_duration) => {
         let key = '__express__' + (req.originalUrl || req.url) + '_' + JSON.stringify(req.body)
         let cachedBody = mcache.get(key)
         if (cachedBody) {
-            console.info('Utilizando Memory Cache')
+            console.info('using cache...')
             res.send(JSON.parse(cachedBody))
             return
         } else {
             res.sendResponse = res.send
             res.send = (body) => {
+                console.info('caching...')
                 mcache.put(key, body, duration * 1000);
                 res.sendResponse(body)
             }
