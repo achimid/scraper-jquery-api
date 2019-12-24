@@ -1,4 +1,5 @@
 const cache = require('../memory-cache')
+var crypto = require('crypto');
 
 const defaults = {
     script: '$("html").html()',
@@ -43,7 +44,13 @@ const evaluate = (req, res) => {
         .then(response => res.send(response))
 }
 
+const hashign = (req, res) => {
+    return scraperUrl(req.body)
+        .then(({response}) => crypto.createHash('md5').update(JSON.stringify(response)).digest("hex"))
+        .then(hash => res.send({ hash }))
+}
 
 module.exports = (app) => {
-    app.post(`/api/evaluate`, cache(), evaluate)
+    app.post(`/api/evaluate`, cache(), evaluate),
+    app.post(`/api/hash`, cache(), hashign)
 }
