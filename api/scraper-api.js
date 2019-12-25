@@ -52,6 +52,6 @@ const hashign = (req, res) => {
 }
 
 module.exports = (app) => {
-    app.post(`/api/evaluate`, cache(), evaluate),
-        app.post(`/api/hash`, cache(), hashign)
+    app.post(`/api/evaluate`, evaluate),
+        app.post(`/api/hash`, hashign)
 }
