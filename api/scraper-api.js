@@ -20,8 +20,8 @@ const scraperUrl = ({ url, options }) => {
 
     console.info('Criando nova pagina')
     return global.browser.newPage()
-        .then(async (page) => { 
-            
+        .then(async (page) => {
+
             console.info('Navegando para Url')
             await page.goto(url)
 
@@ -30,6 +30,7 @@ const scraperUrl = ({ url, options }) => {
 
             console.info('Executando Script')
             response = await page.evaluate(opts.script)
+            console.info('Retorno do script', response)
 
             console.info('Fechando pagina')
             await page.close()
@@ -46,11 +47,11 @@ const evaluate = (req, res) => {
 
 const hashign = (req, res) => {
     return scraperUrl(req.body)
-        .then(({response}) => crypto.createHash('md5').update(JSON.stringify(response)).digest("hex"))
+        .then(({ response }) => crypto.createHash('md5').update(JSON.stringify({response})).digest("hex"))
         .then(hash => res.send({ hash }))
 }
 
 module.exports = (app) => {
     app.post(`/api/evaluate`, cache(), evaluate),
-    app.post(`/api/hash`, cache(), hashign)
+        app.post(`/api/hash`, cache(), hashign)
 }
