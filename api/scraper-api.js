@@ -14,29 +14,27 @@ function validateNotNull(value, message) {
     }
 }
 
-const scraperUrl = ({ url, options }) => {
+const scraperUrl = async ({ url, options }) => {
     validateNotNull(url, 'Url não pode ser null')
     const opts = Object.assign(defaults, options)
 
     console.info('Criando nova pagina')
-    return global.browser.newPage()
-        .then(async (page) => {
+    const page = await global.browser.newPage();
 
-            console.info('Navegando para Url')
-            await page.goto(url)
+    console.info('Navegando para Url', url)
+    await page.goto(url)
 
-            if (opts.importJquery) await page.addScriptTag({ url: process.env.JQUERY_URL_INJECTION })
-            if (opts.waitTime) await page.waitFor(opts.waitTime)
+    if (opts.importJquery) await page.addScriptTag({ url: process.env.JQUERY_URL_INJECTION })
+    if (opts.waitTime) await page.waitFor(opts.waitTime)
 
-            console.info('Executando Script')
-            response = await page.evaluate(opts.script)
-            console.info('Retorno do script', response)
+    console.info('Executando Script')
+    const response = await page.evaluate(opts.script)
+    console.info('Retorno do script', url, response)
 
-            console.info('Fechando pagina')
-            await page.close()
+    console.info('Fechando pagina')
+    await page.close()
 
-            return { response }
-        })
+    return { response }
 }
 
 
