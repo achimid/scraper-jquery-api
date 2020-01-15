@@ -1,4 +1,5 @@
 const puppeteer = require('puppeteer')  
+const databaseInit = require('./database')
 
 const initBrowser = async () => {
     console.info('Inicializando browser......')
@@ -6,4 +7,7 @@ const initBrowser = async () => {
     console.info('Browser inicializado')
 }
 
-module.exports = initBrowser
+module.exports = () => {
+    initBrowser()
+    databaseInit()
+}

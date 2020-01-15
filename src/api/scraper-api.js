@@ -1,4 +1,4 @@
-const cache = require('../memory-cache')
+const cache = require('../../memory-cache')
 var crypto = require('crypto');
 
 const defaults = {
