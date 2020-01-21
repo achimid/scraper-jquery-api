@@ -1,31 +1,14 @@
 const schedule = require('./cron')
+const SiteRequestModel = require('../site-request/sr-model')
+const { execute } = require('../site-execution/se-service')
 
-const execute = () => {
+const executeSiteRequests = async () => {
+    
+    const executions = await SiteRequestModel.find().lean().then(sites => sites.map(execute))
 
-const executeService = async () => {
-    for (let index = 0; index < depositoryMonitoring.length; index++) {
-        const site = depositoryMonitoring[index];
-         
-        const hash = await getHashFromUrl(site.data)
-        console.log('hash', hash)
-
-        // if (!isFirst) {
-            if (hash != site.lastHash) {
-                console.log('hash atualizado')
-                site.lastHash = hash
-                registredIds.forEach(chatId => {
-                    bot.sendMessage(chatId, site.message)
-                    console.log('notificando atualização no site......')
-                })                    
-            } else {
-                console.log('hash igual')
-            }
-        // } else {
-        //     site.lastHash = hash
-        //     isFirst = false
-        // }    
-
-    }
+    console.log('-------->>>>', executions)    
 }
 
-schedule(execute)
+
+module.exports = executeSiteRequests
+    // schedule(executeSiteRequests)

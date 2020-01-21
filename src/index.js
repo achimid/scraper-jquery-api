@@ -3,7 +3,7 @@ require('dotenv').config()
 const express = require('express')
 const compression = require('compression')
 const errorhandler = require('errorhandler')
-const statup = require('./startup')
+const statup = require('./config/startup')
 
 const app = express()
 
@@ -13,7 +13,8 @@ app.use(errorhandler())
 
 // Endpoin registration
 // ================
-require('./api/scraper-api')(app)
+const prefix = process.env.API_PREFIX
+require('./site-request/sr-controller')(prefix)(app)
 // ================
 
 statup()

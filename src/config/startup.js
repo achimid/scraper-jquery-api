@@ -1,5 +1,6 @@
 const puppeteer = require('puppeteer')  
 const databaseInit = require('./database')
+const notifyJobInit = require('../cron/notify-job')
 
 const initBrowser = async () => {
     console.info('Inicializando browser......')
@@ -10,4 +11,5 @@ const initBrowser = async () => {
 module.exports = () => {
     initBrowser()
     databaseInit()
+    notifyJobInit()
 }

@@ -3,15 +3,7 @@ const mongoose = require("mongoose")
 const schema = mongoose.Schema({
     url: { 
         type: mongoose.SchemaTypes.String, 
-        required: true 
-    },
-    siteName: { 
-        type: mongoose.SchemaTypes.String, 
-        required: true 
-    },
-    message: { 
-        type: mongoose.SchemaTypes.String, 
-        required: true 
+        required: true
     },
     scriptTarget: { 
         type: mongoose.SchemaTypes.String, 
@@ -37,5 +29,5 @@ const schema = mongoose.Schema({
     }
 })
 
-const SiteRequest = mongoose.model("SiteRequest", schema)
-module.exports = SiteRequest;
+const SiteExecution = mongoose.model("site-execution", schema)
+module.exports = SiteExecution;
