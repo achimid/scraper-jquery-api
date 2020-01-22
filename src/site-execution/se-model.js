@@ -24,10 +24,13 @@ const schema = mongoose.Schema({
     extractedContent: { 
         type: mongoose.SchemaTypes.String         
     },
+    executionTime: { 
+        type: mongoose.SchemaTypes.Number
+    },
     errorMessage: {
         type: mongoose.SchemaTypes.String
     }
-})
+}, { versionKey: false, timestamps: { createdAt: 'created_at', updatedAt: 'updated_at' } })
 
 const SiteExecution = mongoose.model("site-execution", schema)
 module.exports = SiteExecution;

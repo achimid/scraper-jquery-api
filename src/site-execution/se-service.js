@@ -11,6 +11,8 @@ const toMD5 = (data) => crypto.createHash('md5').update(JSON.stringify({data})).
 
 const execute = async ({url, scriptTarget, scriptContent}) => {
 
+    const startTime = process.hrtime()
+
     console.info('Criando nova pagina')
     const page = await global.browser.newPage();
 
@@ -48,6 +50,8 @@ const execute = async ({url, scriptTarget, scriptContent}) => {
 
         console.error(error)
     }
+
+    execution.executionTime = process.hrtime(startTime)[1] / 1000000 // 0 = seconds, 1 = milisseconds
 
     await Promise.all([
         execution.save(),
