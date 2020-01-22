@@ -4,10 +4,20 @@ const crypto = require('crypto');
 const opts = {
     script: '$("html").html()',
     importJquery: true,
-    waitTime: false
+    waitTime: 1000
 }
 
 const toMD5 = (data) => crypto.createHash('md5').update(JSON.stringify({data})).digest("hex")
+
+const getExecutionTime = (startTime) => process.hrtime(startTime)[1] / 1000000 // 0 = seconds, 1 = milisseconds
+
+const getPromissesEvaluation = (artifact, {scriptTarget, scriptContent}) => {
+    const promisses = [artifact.evaluate(scriptTarget)]
+
+    if (scriptContent) promisses.push(artifact.evaluate(scriptContent))
+
+    return promisses
+}
 
 const execute = async ({url, scriptTarget, scriptContent}) => {
 
@@ -26,14 +36,23 @@ const execute = async ({url, scriptTarget, scriptContent}) => {
 
     try {
         console.info('Executando script')
-
-        const [responseTarget, responseContent] = await Promise.all([
-            page.evaluate(scriptTarget),
-            page.evaluate(scriptContent || opts.script)
-        ])
+        
+        const promisses = getPromissesEvaluation(page, {scriptTarget, scriptContent})        
+        let [responseTarget, responseContent] = await Promise.all(promisses)
         
         console.info('Retorno do script target', url, responseTarget)
         // console.info('Retorno do script content', url, responseContent)
+
+        // Iframe re-try
+        if (!responseTarget) {            
+            for (const frame of page.mainFrame().childFrames()){
+                const promisses = getPromissesEvaluation(frame, {scriptTarget, scriptContent}) 
+                [responseTarget, responseContent] = await Promise.all(promisses)    
+                if (responseTarget) {
+                    break
+                }            
+            }
+        }
 
         if (!responseTarget) {
             throw `Inválid response target: ${url} ==> ${responseTarget}`
@@ -41,7 +60,7 @@ const execute = async ({url, scriptTarget, scriptContent}) => {
 
         execution.isSucess = true
         execution.extractedTarget = responseTarget
-        // execution.extractedContent = responseContent
+        execution.extractedContent = responseContent
         execution.hashTarget = toMD5({responseTarget})
 
     } catch (error) {
@@ -51,12 +70,13 @@ const execute = async ({url, scriptTarget, scriptContent}) => {
         console.error(error)
     }
 
-    execution.executionTime = process.hrtime(startTime)[1] / 1000000 // 0 = seconds, 1 = milisseconds
+    execution.executionTime = getExecutionTime(startTime)
+    console.info('Execution Time =======>>>>>>>>', execution.executionTime)
 
     await Promise.all([
         execution.save(),
         page.close()
-    ])        
+    ])
 
     return execution
 }
