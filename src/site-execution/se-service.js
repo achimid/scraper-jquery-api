@@ -31,29 +31,29 @@ const retryIframe = async (page, {scriptTarget, scriptContent}) => {
 const execute = async ({url, scriptTarget, scriptContent}) => {
 
     const startTime = process.hrtime()
+    
+    const execution = new SiteExecutionModel({ url, scriptTarget, scriptContent })
 
     console.info('Criando nova pagina')
     const page = await global.browser.newPage();
 
-    console.info('Navegando para Url', url)
-    await page.goto(url)
-
-    if (opts.importJquery) await page.addScriptTag({ url: process.env.JQUERY_URL_INJECTION })
-    if (opts.waitTime) await page.waitFor(opts.waitTime)
-    
-    const execution = new SiteExecutionModel({ url, scriptTarget, scriptContent })
-
     try {
+
+        console.info('Navegando para Url', url)
+        await page.goto(url, { waitUntil: 'networkidle0' })
+
+        if (opts.importJquery) await page.addScriptTag({ url: process.env.JQUERY_URL_INJECTION })        
+
         console.info('Executando script')
         
         const promisses = getPromissesEvaluation(page, {scriptTarget, scriptContent})        
         let [responseTarget, responseContent] = await Promise.all(promisses)
         
-        console.info('Retorno do script target', url, responseTarget)
+        console.info('Retorno do script target', url, responseTarget.trim())
         // console.info('Retorno do script content', url, responseContent)
 
         if (!responseTarget) {            
-            [responseTarget, responseContent] = await retryIframe(page)
+            [responseTarget, responseContent] = await retryIframe(page, {scriptTarget, scriptContent})
         }
 
         if (!responseTarget) {
