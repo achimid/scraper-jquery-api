@@ -19,6 +19,15 @@ const getPromissesEvaluation = (artifact, {scriptTarget, scriptContent}) => {
     return promisses
 }
 
+const retryIframe = async (page, {scriptTarget, scriptContent}) => {
+    for (const frame of page.mainFrame().childFrames()){
+        const promisses = getPromissesEvaluation(frame, {scriptTarget, scriptContent}) 
+        [responseTarget, responseContent] = await Promise.all(promisses)    
+        return [responseTarget, responseContent]
+    }
+    return [null, null]
+}
+
 const execute = async ({url, scriptTarget, scriptContent}) => {
 
     const startTime = process.hrtime()
@@ -43,28 +52,21 @@ const execute = async ({url, scriptTarget, scriptContent}) => {
         console.info('Retorno do script target', url, responseTarget)
         // console.info('Retorno do script content', url, responseContent)
 
-        // Iframe re-try
         if (!responseTarget) {            
-            for (const frame of page.mainFrame().childFrames()){
-                const promisses = getPromissesEvaluation(frame, {scriptTarget, scriptContent}) 
-                [responseTarget, responseContent] = await Promise.all(promisses)    
-                if (responseTarget) {
-                    break
-                }            
-            }
+            [responseTarget, responseContent] = await retryIframe(page)
         }
 
         if (!responseTarget) {
             throw `Inválid response target: ${url} ==> ${responseTarget}`
-        }
+        }        
 
-        execution.isSucess = true
-        execution.extractedTarget = responseTarget
-        execution.extractedContent = responseContent
-        execution.hashTarget = toMD5({responseTarget})
+        execution.isSuccess = true
+        if (responseTarget) execution.extractedTarget = responseTarget.trim()
+        if (responseContent) execution.extractedContent = responseContent.trim()
+        execution.hashTarget = toMD5({result: responseTarget.trim()})
 
     } catch (error) {
-        execution.isSucess = false
+        execution.isSuccess = false
         execution.errorMessage = error
 
         console.error(error)

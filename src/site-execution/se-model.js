@@ -33,4 +33,4 @@ const schema = mongoose.Schema({
 }, { versionKey: false, timestamps: { createdAt: 'created_at', updatedAt: 'updated_at' } })
 
 const SiteExecution = mongoose.model("site-execution", schema)
-module.exports = SiteExecution;
+module.exports = SiteExecution

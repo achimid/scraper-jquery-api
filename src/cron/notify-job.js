@@ -2,13 +2,40 @@ const schedule = require('./cron')
 const SiteRequestModel = require('../site-request/sr-model')
 const { execute } = require('../site-execution/se-service')
 
-const executeSiteRequests = async () => {
-    const executions = await SiteRequestModel.find().lean().then(sites => sites.map(execute))
-
-    const results = await Promise.all(executions)
-    console.log(results)
+const parseUpdateData = (exect) => {
+    const updateData = { isSuccess: exect.isSuccess}
+    if (exect.isSuccess) {
+        updateData.hashTarget = exect.hashTarget
+        updateData.extractedTarget = exect.extractedTarget
+        updateData.extractedContent = exect.extractedContent
+    } else {
+        updateData.errorMessage = exect.errorMessage
+    }
+    
+    return updateData    
 }
 
+const notifyChanels = async (site) => {
 
-module.exports = executeSiteRequests
+}
+
+const executeSiteRequests = async () => {
+    const sites = await SiteRequestModel.find()
+    
+    const executions = sites.map(site => {
+        return execute(site).then(exect => {
+            const hashChanged = site.hashTarget != exect.hashTarget
+            Object.assign(site, parseUpdateData(exect))
+
+            if (hashChanged) notifyChanels(site)
+
+            return site.save()    
+        })        
+    })
+    
+    await Promise.all(executions)
+}
+
+module.exports = () => {}
+// module.exports = executeSiteRequests
     // schedule(executeSiteRequests)
