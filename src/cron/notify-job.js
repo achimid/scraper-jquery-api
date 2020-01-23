@@ -1,7 +1,7 @@
 const schedule = require('./cron')
 const SiteRequestModel = require('../site-request/sr-model')
 const { execute } = require('../site-execution/se-service')
-const Telegram = require('../notification/telegram')
+const Telegram = require('../notification/telegram/telegram')
 
 const parseUpdateData = (exect) => {
     const updateData = { isSuccess: exect.isSuccess}
@@ -16,7 +16,14 @@ const parseUpdateData = (exect) => {
     return updateData    
 }
 
-const notifyChanels = async (site) => Telegram.notifyAll(site.message)
+const buildMessage = (site) => {
+    return `${site.message} \n [${site.extractedContent}]`
+}
+
+const notifyChanels = async (site) => {
+    const message = buildMessage(site)
+    return Telegram.notifyAll(message)
+}
 
 const executeSiteRequests = async () => {
     const sites = await SiteRequestModel.find()
@@ -28,7 +35,8 @@ const executeSiteRequests = async () => {
             const hashChanged = site.hashTarget != exect.hashTarget
             Object.assign(site, parseUpdateData(exect))
 
-            if (hashChanged) notifyChanels(site)
+            // if (hashChanged) 
+            notifyChanels(site)
 
             return site.save()    
         })        
@@ -38,8 +46,7 @@ const executeSiteRequests = async () => {
 }
 
 module.exports = () => {
-    schedule(executeSiteRequests)
+    executeSiteRequests()
+    // schedule(executeSiteRequests)
 }
 
-// module.exports = executeSiteRequests
-//     schedule(executeSiteRequests)

@@ -50,7 +50,7 @@ const execute = async ({url, scriptTarget, scriptContent}) => {
         let [responseTarget, responseContent] = await Promise.all(promisses)
         
         console.info('Retorno do script target', url, responseTarget.trim())
-        // console.info('Retorno do script content', url, responseContent)
+        console.info('Retorno do script content', url, responseContent)
 
         if (!responseTarget) {            
             [responseTarget, responseContent] = await retryIframe(page, {scriptTarget, scriptContent})

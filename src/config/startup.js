@@ -1,7 +1,7 @@
 const puppeteer = require('puppeteer')  
 const databaseInit = require('./database')
 const notifyJobInit = require('../cron/notify-job')
-const { telegramStartup } = require('../notification/telegram')
+const { telegramStartup } = require('../notification/telegram/telegram')
 
 const initBrowser = async () => {
     console.info('Inicializando browser......')
