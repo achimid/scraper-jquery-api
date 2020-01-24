@@ -8,19 +8,22 @@ const schema = mongoose.Schema({
     name: { 
         type: mongoose.SchemaTypes.String
     },
-    scriptTarget: [{
+    scriptTarget: {
+        type: mongoose.SchemaTypes.String
+    },
+    scriptContent: [{
         type: mongoose.SchemaTypes.String
     }],
     options: {
-        hit_time: {type: mongoose.SchemaTypes.Number},
-        only_changed: {type: mongoose.SchemaTypes.Boolean},
-        use_jquery: {type: mongoose.SchemaTypes.Boolean},
-        wait_time: {type: mongoose.SchemaTypes.Mixed},
+        hitTime: {type: mongoose.SchemaTypes.Number, default: process.env.OPTIONS_DEFAULT_HIT_TIME},
+        onlyChanged: {type: mongoose.SchemaTypes.Boolean, default: process.env.OPTIONS_DEFAULT_ONLY_CHANGED},
+        useJquery: {type: mongoose.SchemaTypes.Boolean, default: process.env.OPTIONS_DEFAULT_USE_JQUERY},
+        waitTime: {type: mongoose.SchemaTypes.Number, default: process.env.OPTIONS_DEFAULT_WAIT_TIME},
     },
     notification: [{
         type: Object
     }],
-    last_execution: {
+    lastExecution: {
         message: { 
             type: mongoose.SchemaTypes.String
         },
@@ -36,9 +39,9 @@ const schema = mongoose.Schema({
         extractedTarget: {
             type: mongoose.SchemaTypes.String
         },
-        extractedContent: { 
+        extractedContent: [{ 
             type: mongoose.SchemaTypes.String         
-        },
+        }],
         errorMessage: {
             type: mongoose.SchemaTypes.String
         }
@@ -74,7 +77,7 @@ module.exports = SiteRequest
 				"bot_token:": "1038340863:AAFmixa_WtcjlEbcGNAPvD-ArUBA7Kr-xUE",
 				"chat_id": [123456789]
 			},
-			"template": "<a href=\"https:\/\/www.animestc.com\">AnimesTeleCine<\/a>"
+			"template": "<a href=\"{url}">AnimesTeleCine<\/a> {0} "
 		},
 		{
 			"email": ["achimid@hotmail.com"],

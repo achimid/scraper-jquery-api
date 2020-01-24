@@ -1,35 +1,34 @@
 const SiteExecutionModel = require('./se-model')
 const crypto = require('crypto');
 
-const opts = {
-    script: '$("html").html()',
-    importJquery: true,
-    waitTime: 1000
-}
-
 const toMD5 = (data) => crypto.createHash('md5').update(JSON.stringify({data})).digest("hex")
 
 const getExecutionTime = (startTime) => process.hrtime(startTime)[1] / 1000000 // 0 = seconds, 1 = milisseconds
 
-const getPromissesEvaluation = (artifact, {scriptTarget, scriptContent}) => {
-    const promisses = [artifact.evaluate(scriptTarget)]
+const getPromissesEvaluation = (artifact, script) => {
+    const promisses = []
 
-    if (scriptContent) promisses.push(artifact.evaluate(scriptContent))
+    if (Array.isArray(script)) {
+        script.forEach(item => {
+            promisses.push(artifact.evaluate(item))
+        })        
+    } else {
+        promisses.push(artifact.evaluate(script))
+    }
 
     return promisses
 }
 
-const retryIframe = async (page, {scriptTarget, scriptContent}) => {
+const retryIframe = async (page, {scriptTarget, script}) => {
     for (const frame of page.mainFrame().childFrames()){
-        const promisses = getPromissesEvaluation(frame, {scriptTarget, scriptContent}) 
-        [responseTarget, responseContent] = await Promise.all(promisses)    
-        return [responseTarget, responseContent]
+        return Promise.all(getPromissesEvaluation(frame, script))
     }
-    return [null, null]
+    return
 }
 
 const execute = async (req) => {
-    const { url, scriptTarget, scripts }  = req
+    const { url, scriptTarget, scriptContent, options }  = req
+
     const startTime = process.hrtime()
     
     const execution = new SiteExecutionModel({ url, scriptTarget, scriptContent })
@@ -42,28 +41,32 @@ const execute = async (req) => {
         console.info('Navegando para Url', url)
         await page.goto(url, { waitUntil: 'networkidle0' })
 
-        if (opts.importJquery) await page.addScriptTag({ url: process.env.JQUERY_URL_INJECTION })        
+        if (options.useJquery) await page.addScriptTag({ url: process.env.JQUERY_URL_INJECTION })
+        if (options.waitTime) await page.waitFor(options.waitTime)
 
         console.info('Executando script')
         
-        const promisses = getPromissesEvaluation(page, {scriptTarget, scriptContent})        
-        let [responseTarget, responseContent] = await Promise.all(promisses)
+        let [responseTarget] = await Promise.all(getPromissesEvaluation(page, scriptTarget))
+        let responseContent = await Promise.all(getPromissesEvaluation(page, scriptContent))
         
         console.info('Retorno do script target', url, responseTarget.trim())
         console.info('Retorno do script content', url, responseContent)
 
         if (!responseTarget) {            
-            [responseTarget, responseContent] = await retryIframe(page, {scriptTarget, scriptContent})
+            [responseTarget] = await retryIframe(page, scriptTarget)
+            responseContent = await retryIframe(page, scriptContent)
         }
 
         if (!responseTarget) {
             throw `Inválid response target: ${url} ==> ${responseTarget}`
-        }        
+        }
+
+        responseTarget = responseTarget.trim()
 
         execution.isSuccess = true
-        if (responseTarget) execution.extractedTarget = responseTarget.trim()
-        if (responseContent) execution.extractedContent = responseContent.trim()
-        execution.hashTarget = toMD5({result: responseTarget.trim()})
+        if (responseTarget) execution.extractedTarget = responseTarget
+        if (responseContent) execution.extractedContent = responseContent
+        execution.hashTarget = toMD5({result: responseTarget})
 
     } catch (error) {
         execution.isSuccess = false

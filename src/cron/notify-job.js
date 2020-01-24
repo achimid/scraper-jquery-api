@@ -33,11 +33,11 @@ const executeSiteRequests = async () => {
         return execute(req).then(exect => {
             if (!exect.isSuccess) return
             
-            const hashChanged = req.last_execution.hashTarget != exect.hashTarget
+            const hashChanged = req.lastExecution.hashTarget != exect.hashTarget
             
-            Object.assign(req, { last_execution: parseUpdateData(exect) })
+            Object.assign(req, { lastExecution: parseUpdateData(exect) })
             
-            if (hashChanged || !req.options.only_changed) 
+            if ((hashChanged && req.options.onlyChanged) || !req.options.onlyChanged) 
                 notifyChannels(req)
 
             return req.save()    

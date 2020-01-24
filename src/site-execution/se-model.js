@@ -21,9 +21,9 @@ const schema = mongoose.Schema({
     extractedTarget: {
         type: mongoose.SchemaTypes.String
     },
-    extractedContent: { 
+    extractedContent: [{ 
         type: mongoose.SchemaTypes.String         
-    },
+    }],
     executionTime: { 
         type: mongoose.SchemaTypes.Number
     },
