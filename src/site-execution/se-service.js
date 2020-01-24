@@ -28,8 +28,8 @@ const retryIframe = async (page, {scriptTarget, scriptContent}) => {
     return [null, null]
 }
 
-const execute = async ({url, scriptTarget, scriptContent}) => {
-
+const execute = async (req) => {
+    const { url, scriptTarget, scripts }  = req
     const startTime = process.hrtime()
     
     const execution = new SiteExecutionModel({ url, scriptTarget, scriptContent })

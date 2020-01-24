@@ -9,9 +9,9 @@ const schema = mongoose.Schema({
         type: mongoose.SchemaTypes.String, 
         required: true 
     },
-    scriptContent: { 
+    scriptContent: [{ 
         type: mongoose.SchemaTypes.String
-    },
+    }],
     isSuccess: {
         type: mongoose.SchemaTypes.Boolean
     },    
@@ -26,6 +26,9 @@ const schema = mongoose.Schema({
     },
     executionTime: { 
         type: mongoose.SchemaTypes.Number
+    },
+    message: { 
+        type: mongoose.SchemaTypes.String
     },
     errorMessage: {
         type: mongoose.SchemaTypes.String
