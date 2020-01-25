@@ -26,29 +26,34 @@ const notifyChannels = async (site) => {
     return Telegram.notifyAll(message)
 }
 
-const executeSiteRequests = async () => {
-    const requests = await SiteRequestModel.find()
-    
-    const executions = requests.map(req => {
-        return execute(req).then(exect => {
-            if (!exect.isSuccess) return
-            
-            const hashChanged = req.lastExecution.hashTarget != exect.hashTarget
-            
-            Object.assign(req, { lastExecution: parseUpdateData(exect) })
-            
-            if ((hashChanged && req.options.onlyChanged) || !req.options.onlyChanged) 
-                notifyChannels(req)
+const executeSiteRequests = (req) => execute(req)
+    .then(exect => {
+        if (!exect.isSuccess) return
+        
+        const hashChanged = req.lastExecution.hashTarget != exect.hashTarget
+        
+        Object.assign(req, { lastExecution: parseUpdateData(exect) })
+        
+        if ((hashChanged && req.options.onlyChanged) || !req.options.onlyChanged) 
+            notifyChannels(req)
 
-            return req.save()    
-        })        
+        return req.save()    
     })
-    
-    await Promise.all(executions)
-}
 
-module.exports = () => {
-    executeSiteRequests()
+const initSchedulesRequests = () => SiteRequestModel.find()
+    .then(requests => requests.map(req => {
+        console.info(`Starting job for ${req.url} runing each ${req.options.hitTime} minute`)
+        return schedule(() => {
+            return executeSiteRequests(req)
+        },`*/${req.options.hitTime} * * * *` )
+    }))
+    
+
+
+module.exports = initSchedulesRequests
+
+// module.exports = () => {
+    // executeSiteRequests()
     // schedule(executeSiteRequests)
-}
+// }
 
