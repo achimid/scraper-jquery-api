@@ -17,6 +17,7 @@ const schema = mongoose.Schema({
     options: {
         hitTime: {type: mongoose.SchemaTypes.Number, default: process.env.OPTIONS_DEFAULT_HIT_TIME},
         onlyChanged: {type: mongoose.SchemaTypes.Boolean, default: process.env.OPTIONS_DEFAULT_ONLY_CHANGED},
+        onlyUnique: {type: mongoose.SchemaTypes.Boolean, default: process.env.OPTIONS_DEFAULT_ONLY_UNIQUE},
         useJquery: {type: mongoose.SchemaTypes.Boolean, default: process.env.OPTIONS_DEFAULT_USE_JQUERY},
         waitTime: {type: mongoose.SchemaTypes.Number, default: process.env.OPTIONS_DEFAULT_WAIT_TIME},
     },
@@ -35,6 +36,9 @@ const schema = mongoose.Schema({
         },    
         hashTarget: {
             type: mongoose.SchemaTypes.String
+        },
+        hashChanged: {
+            type: mongoose.SchemaTypes.Boolean
         },
         extractedTarget: {
             type: mongoose.SchemaTypes.String

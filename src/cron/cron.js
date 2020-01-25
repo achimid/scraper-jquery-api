@@ -1,7 +1,7 @@
 const cron = require('node-cron');
 
 const schedule = (callback, time) => new Promise((resolve, reject) => {
-    cron.schedule(time || process.env.CRON_TIME , () => {
+    cron.schedule(time || process.env.CRON_TIME_DEFAULT , () => {
         console.log('Iniciando execução do Job')
         try {
             resolve(callback())

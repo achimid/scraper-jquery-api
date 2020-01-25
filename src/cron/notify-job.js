@@ -1,5 +1,6 @@
 const schedule = require('./cron')
 const SiteRequestModel = require('../site-request/sr-model')
+const SiteExecutionModel = require('../site-execution/se-model')
 const { execute } = require('../site-execution/se-service')
 const Telegram = require('../notification/telegram/telegram')
 
@@ -26,16 +27,33 @@ const notifyChannels = async (site) => {
     return Telegram.notifyAll(message)
 }
 
+const validateAndNotify = async () => {
+    try {
+            
+        if (req.options.onlyChanged && !hashChanged) 
+            throw 'hash not changed'
+
+        if (req.options.onlyUnique) {
+            const isUnique = await SiteExecutionModel.count({hashTarget}) <= 0
+            if (!isUnique) throw 'is not unique'
+        }
+
+        await notifyChannels(req)
+    } catch (error) {
+        console.info('Notification not sent: ', error)
+    }            
+}
+
 const executeSiteRequests = (req) => execute(req)
-    .then(exect => {
+    .then(async (exect) => {
         if (!exect.isSuccess) return
         
-        const hashChanged = req.lastExecution.hashTarget != exect.hashTarget
-        
+        req.lastExecution.hashChanged = req.lastExecution.hashTarget != exect.hashTarget
+
+        // Copy execution into requisition.lastExecution
         Object.assign(req, { lastExecution: parseUpdateData(exect) })
-        
-        if ((hashChanged && req.options.onlyChanged) || !req.options.onlyChanged) 
-            notifyChannels(req)
+
+        await validateAndNotify
 
         return req.save()    
     })
