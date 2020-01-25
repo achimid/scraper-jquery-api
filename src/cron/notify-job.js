@@ -27,14 +27,14 @@ const notifyChannels = async (site) => {
     return Telegram.notifyAll(message)
 }
 
-const validateAndNotify = async () => {
+const validateAndNotify = async (req) => {
     try {
             
-        if (req.options.onlyChanged && !hashChanged) 
+        if (req.options.onlyChanged && !req.lastExecution.hashChanged) 
             throw 'hash not changed'
 
         if (req.options.onlyUnique) {
-            const isUnique = await SiteExecutionModel.count({hashTarget}) <= 0
+            const isUnique = await SiteExecutionModel.countDocuments({hashTarget: req.lastExecution.hashTarget}) <= 0
             if (!isUnique) throw 'is not unique'
         }
 
@@ -48,12 +48,13 @@ const executeSiteRequests = (req) => execute(req)
     .then(async (exect) => {
         if (!exect.isSuccess) return
         
-        req.lastExecution.hashChanged = req.lastExecution.hashTarget != exect.hashTarget
+        const hashChanged = req.lastExecution.hashTarget != exect.hashTarget
 
         // Copy execution into requisition.lastExecution
         Object.assign(req, { lastExecution: parseUpdateData(exect) })
+        req.lastExecution.hashChanged = hashChanged
 
-        await validateAndNotify
+        await validateAndNotify(req)
 
         return req.save()    
     })
@@ -63,7 +64,8 @@ const initSchedulesRequests = () => SiteRequestModel.find()
         console.info(`Starting job for ${req.url} runing each ${req.options.hitTime} minute`)
         return schedule(() => {
             return executeSiteRequests(req)
-        },`*/${req.options.hitTime} * * * *` )
+        // },`*/${req.options.hitTime} * * * * *` )
+        },`*/30 * * * * *` )
     }))
     
 
