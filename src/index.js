@@ -15,6 +15,7 @@ app.use(errorhandler())
 // ================
 const prefix = process.env.API_PREFIX
 require('./site-request/sr-controller')(prefix)(app)
+require('./config/helthcheck')(prefix)(app)
 // ================
 
 statup()

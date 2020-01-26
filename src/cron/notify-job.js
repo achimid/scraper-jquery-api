@@ -2,6 +2,7 @@ const schedule = require('./cron')
 const SiteRequestModel = require('../site-request/sr-model')
 const SiteExecutionModel = require('../site-execution/se-model')
 const Telegram = require('../notification/telegram/telegram')
+const EmailDispatcher = require('../notification/email/email-dispatcher')
 const { execute } = require('../site-execution/se-service')
 const { templateFormat } = require('../utils/template-engine')
 
@@ -24,8 +25,16 @@ const notifyChannels = (site) => {
     return Promise.all(site.notification.map(notf => {
         // TODO: melhorar aqui quando tiver mais integrações
         // if telegram || sms || email
+        
         const message = templateFormat(site, notf.template)
-        return Telegram.notifyAll(message)
+
+        if (notf.telegram) {
+            return Telegram.notifyAll(message)
+        } else if (notf.email) {
+            const emailDest = notf.email.join(", ")
+            return EmailDispatcher.sendEMail(emailDest, message)
+        }
+        
     }))
 }
 
