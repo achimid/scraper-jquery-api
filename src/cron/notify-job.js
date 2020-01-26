@@ -19,9 +19,6 @@ const parseUpdateData = (exect) => {
     return updateData    
 }
 
-const buildMessage = (site) => {
-    return `${site.message} \n [${site.extractedContent}]`
-}
 
 const notifyChannels = (site) => {
     return Promise.all(site.notification.map(notf => {
@@ -33,9 +30,9 @@ const notifyChannels = (site) => {
 }
 
 
-const countHash = (req) => SiteExecutionModel.countDocuments({hashTarget: req.lastExecution.hashTarget})
+const countHash = (req, exect) => SiteExecutionModel.countDocuments({url: req.url, hashTarget: req.lastExecution.hashTarget, _id: { $ne: exect._id}})
 
-const validateAndNotify = async (req) => {
+const validateAndNotify = async (req, exect) => {
     try {
             
         if (req.options.onlyChanged && !req.lastExecution.hashChanged) 
@@ -47,6 +44,9 @@ const validateAndNotify = async (req) => {
         }
 
         await notifyChannels(req)
+
+        exect.isNotified = true
+        exect.save()
     } catch (error) {
         console.info('Notification not sent: ', error)
     }            
@@ -62,7 +62,7 @@ const executeSiteRequests = (req) => execute(req)
         Object.assign(req, { lastExecution: parseUpdateData(exect) })
         req.lastExecution.hashChanged = hashChanged
 
-        await validateAndNotify(req)
+        await validateAndNotify(req, exect)
 
         return req.save()    
     })
@@ -72,8 +72,8 @@ const initSchedulesRequests = () => SiteRequestModel.find()
         console.info(`Starting job for ${req.url} runing each ${req.options.hitTime} minute`)
         return schedule(() => {
             return executeSiteRequests(req)
-        // },`*/${req.options.hitTime} * * * * *` )
-        },`*/15 * * * * *` ) // TODO: Remover
+        },`*/${req.options.hitTime} * * * *` )
+        // },`*/15 * * * * *` ) // TODO: Remover
     }))
     
 

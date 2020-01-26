@@ -64,7 +64,7 @@ module.exports = SiteRequest
 	"url": "https://www.animestc.com/",
 	"name": "AnimesTeleCine",
 	"scriptTarget": "$('.dados-down-epi > .titulo-down-epi').first().html()",
-	"scripts": [
+	"scriptContent": [
 		"$('.dados-down-epi > .titulo-down-epi').first().text().trim()",
 		"$('.dados-down-epi > .titulo-down-epi').first().text().trim()",
 		"$('.dados-down-epi > .titulo-down-epi').first().text().trim()"

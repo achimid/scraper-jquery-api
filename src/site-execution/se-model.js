@@ -14,7 +14,10 @@ const schema = mongoose.Schema({
     }],
     isSuccess: {
         type: mongoose.SchemaTypes.Boolean
-    },    
+    },
+    isNotified: {
+        type: mongoose.SchemaTypes.Boolean
+    },
     hashTarget: {
         type: mongoose.SchemaTypes.String
     },
