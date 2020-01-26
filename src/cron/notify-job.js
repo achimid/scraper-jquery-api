@@ -39,7 +39,7 @@ const validateAndNotify = async (req, exect) => {
             throw 'hash not changed'
 
         if (req.options.onlyUnique) {
-            const isUnique = await countHash(req) <= 0
+            const isUnique = await countHash(req, exect) <= 0
             if (!isUnique) throw 'is not unique'
         }
 
