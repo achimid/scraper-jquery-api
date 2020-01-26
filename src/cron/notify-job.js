@@ -1,8 +1,9 @@
 const schedule = require('./cron')
 const SiteRequestModel = require('../site-request/sr-model')
 const SiteExecutionModel = require('../site-execution/se-model')
-const { execute } = require('../site-execution/se-service')
 const Telegram = require('../notification/telegram/telegram')
+const { execute } = require('../site-execution/se-service')
+const { templateFormat } = require('../utils/template-engine')
 
 const parseUpdateData = (exect) => {
     const updateData = { isSuccess: exect.isSuccess}
@@ -22,10 +23,17 @@ const buildMessage = (site) => {
     return `${site.message} \n [${site.extractedContent}]`
 }
 
-const notifyChannels = async (site) => {
-    const message = buildMessage(site)
-    return Telegram.notifyAll(message)
+const notifyChannels = (site) => {
+    return Promise.all(site.notification.map(notf => {
+        // TODO: melhorar aqui quando tiver mais integrações
+        // if telegram || sms || email
+        const message = templateFormat(site, notf.template)
+        return Telegram.notifyAll(message)
+    }))
 }
+
+
+const countHash = (req) => SiteExecutionModel.countDocuments({hashTarget: req.lastExecution.hashTarget})
 
 const validateAndNotify = async (req) => {
     try {
@@ -34,7 +42,7 @@ const validateAndNotify = async (req) => {
             throw 'hash not changed'
 
         if (req.options.onlyUnique) {
-            const isUnique = await SiteExecutionModel.countDocuments({hashTarget: req.lastExecution.hashTarget}) <= 0
+            const isUnique = await countHash(req) <= 0
             if (!isUnique) throw 'is not unique'
         }
 
@@ -65,7 +73,7 @@ const initSchedulesRequests = () => SiteRequestModel.find()
         return schedule(() => {
             return executeSiteRequests(req)
         // },`*/${req.options.hitTime} * * * * *` )
-        },`*/30 * * * * *` )
+        },`*/15 * * * * *` ) // TODO: Remover
     }))
     
 

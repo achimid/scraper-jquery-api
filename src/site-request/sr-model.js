@@ -44,7 +44,7 @@ const schema = mongoose.Schema({
             type: mongoose.SchemaTypes.String
         },
         extractedContent: [{ 
-            type: mongoose.SchemaTypes.String         
+            type: Object
         }],
         errorMessage: {
             type: mongoose.SchemaTypes.String
