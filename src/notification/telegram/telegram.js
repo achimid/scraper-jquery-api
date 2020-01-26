@@ -28,7 +28,7 @@ const telegramStartup = () => {
 }
 
 const notify = (chat, message) => {
-    bot.sendMessage(chat.id, message, {parse_mode: "HTML"})
+    bot.sendMessage(chat.id, message, {parse_mode: "HTML", disable_web_page_preview: true})
 }
 
 
