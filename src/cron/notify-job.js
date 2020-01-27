@@ -78,8 +78,8 @@ const initSchedulesRequests = () => SiteRequestModel.find()
         console.info(`Starting job for ${req.url} runing each ${req.options.hitTime} minute`)
         return schedule(() => {
             return executeSiteRequests(req)
-        // },`*/${req.options.hitTime} * * * *` )
-        },`*/15 * * * * *` ) // TODO: Remover
+        },`*/${req.options.hitTime} * * * *` )
+        // },`*/15 * * * * *` ) // TODO: Remover
     }))
     
 
