@@ -11,4 +11,5 @@ Criar um gerenciamento de usuario e contas
         Fazer um fallback para enviar para o bot de teste por padrão
     Possivel informar o login e senha do gmail de disparo de e-mail
         Fazer um tratamaento para quando da erro nas integrações
-   
+
+implementar proxy
