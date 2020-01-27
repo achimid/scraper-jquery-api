@@ -53,9 +53,6 @@ const validateAndNotify = async (req, exect) => {
         }
 
         await notifyChannels(req)
-
-        exect.isNotified = true
-        exect.save()
     } catch (error) {
         console.info('Notification not sent: ', error)
     }            
@@ -81,8 +78,8 @@ const initSchedulesRequests = () => SiteRequestModel.find()
         console.info(`Starting job for ${req.url} runing each ${req.options.hitTime} minute`)
         return schedule(() => {
             return executeSiteRequests(req)
-        },`*/${req.options.hitTime} * * * *` )
-        // },`*/15 * * * * *` ) // TODO: Remover
+        // },`*/${req.options.hitTime} * * * *` )
+        },`*/15 * * * * *` ) // TODO: Remover
     }))
     
 
