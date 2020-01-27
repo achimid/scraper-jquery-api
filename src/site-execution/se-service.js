@@ -49,7 +49,7 @@ const execute = async (req) => {
         let [responseTarget] = await Promise.all(getPromissesEvaluation(page, scriptTarget))
         let responseContent = await Promise.all(getPromissesEvaluation(page, scriptContent))
         
-        console.info('Retorno do script target', url, responseTarget.trim())
+        console.info('Retorno do script target', url, responseTarget)
         console.info('Retorno do script content', url, responseContent)
 
         if (!responseTarget) {            
