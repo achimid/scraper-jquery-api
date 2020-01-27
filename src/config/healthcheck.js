@@ -6,7 +6,7 @@ const pingRequest = (req, res) => {
     res.json({status: 'ok'})
 }
 
-const fetchHeathCheck = () => {
+const fetchHealthCheck = () => {
     fetch(process.env.API_URL + process.env.API_PREFIX)
         .then(res => res.json())
         .then(json => {
@@ -18,5 +18,5 @@ const fetchHeathCheck = () => {
 
 module.exports = (prefix) => (app) => {    
     app.get(`${prefix}`, pingRequest)
-    schedule(fetchHeathCheck)
+    schedule(fetchHealthCheck)
 }

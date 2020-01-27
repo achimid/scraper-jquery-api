@@ -3,11 +3,13 @@ require('dotenv').config()
 const express = require('express')
 const compression = require('compression')
 const errorhandler = require('errorhandler')
+const monitor = require('express-status-monitor')
 const statup = require('./config/startup')
 
 const app = express()
 
-app.use(compression());
+app.use(monitor())
+app.use(compression())
 app.use(express.json())
 app.use(errorhandler())
 
@@ -15,7 +17,7 @@ app.use(errorhandler())
 // ================
 const prefix = process.env.API_PREFIX
 require('./site-request/sr-controller')(prefix)(app)
-require('./config/helthcheck')(prefix)(app)
+require('./config/healthcheck')(prefix)(app)
 // ================
 
 statup()
