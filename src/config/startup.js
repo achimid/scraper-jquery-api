@@ -5,7 +5,7 @@ const { telegramStartup } = require('../notification/telegram/telegram')
 
 const initBrowser = async () => {
     console.info('Inicializando browser......')
-    global.browser = await puppeteer.launch({args: ['--no-sandbox', '--disable-setuid-sandbox', '--proxy-server=http://173.249.35.163:10010']});
+    global.browser = await puppeteer.launch({args: ['--no-sandbox', '--disable-setuid-sandbox']});
     console.info('Browser inicializado')
 }
 
