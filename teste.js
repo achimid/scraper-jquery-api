@@ -3,7 +3,7 @@ const puppeteer = require('puppeteer');
      const browser = await puppeteer.launch({
         ignoreHTTPSErrors: true,
         args: [
-            '--proxy-server=http://173.249.35.163:10010'
+            '--proxy-server=http://189.84.48.122:8080'
         ]
     });
     const page = await browser.newPage();
