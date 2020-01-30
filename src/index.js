@@ -11,12 +11,15 @@ const app = express()
 app.use(monitor())
 app.use(compression())
 app.use(express.json())
+app.use('/execute', express.static('public'));
 app.use(errorhandler())
+
 
 // Endpoin registration
 // ================
 const prefix = process.env.API_PREFIX
 require('./site-request/sr-controller')(prefix)(app)
+require('./site-execution/se-controller')(prefix)(app)
 require('./config/healthcheck')(prefix)(app)
 // ================
 

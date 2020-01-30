@@ -73,7 +73,10 @@ const executeSiteRequests = (req) => execute(req)
         return req.save()    
     })
 
-const initSchedulesRequests = () => SiteRequestModel.find()
+const initSchedulesRequests = () => {    
+    if (process.env.ENABLE_JOB !== 'true') return
+
+    return SiteRequestModel.find()
     .then(requests => requests.map(req => {
         console.info(`Starting job for ${req.url} runing each ${req.options.hitTime} minute`)
         return schedule(() => {
@@ -81,8 +84,8 @@ const initSchedulesRequests = () => SiteRequestModel.find()
         },`*/${req.options.hitTime} * * * *` )
         // },`*/15 * * * * *` ) // TODO: Remover
     }))
+}
     
-
 
 module.exports = initSchedulesRequests
 
