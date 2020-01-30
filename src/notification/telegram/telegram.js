@@ -1,10 +1,11 @@
 const TelegramBot = require('node-telegram-bot-api')
 const TelegramChatModel = require('./telegram-chat-model')
 
+const enableTelegram = process.env.ENABLE_TELEGRAM !== 'true'
+
 const bot = new TelegramBot(process.env.TELEGRAM_TOKEN, {polling: true})
 
-const telegramStartup = () => {
-    if (process.env.ENABLE_TELEGRAM !== 'true') return
+const telegramStartup = () => {    
     
     bot.onText(/\/notify_all_start/, (msg) => {
         new TelegramChatModel(msg.chat).save()

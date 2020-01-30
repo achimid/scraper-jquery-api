@@ -23,16 +23,12 @@ const parseUpdateData = (exect) => {
 
 const notifyChannels = (site) => {
     return Promise.all(site.notification.map(notf => {
-        // TODO: melhorar aqui quando tiver mais integrações
-        // if telegram || sms || email
-        
         const message = templateFormat(site, notf.template)
 
         if (notf.telegram) {
             return Telegram.notifyAll(message)
         } else if (notf.email) {
-            const emailDest = notf.email.join(", ")
-            return EmailDispatcher.sendEMail(emailDest, message)
+            return EmailDispatcher.sendEMail(notf.email, message)
         }
         
     }))
@@ -79,18 +75,16 @@ const initSchedulesRequests = () => {
     return SiteRequestModel.find()
     .then(requests => requests.map(req => {
         console.info(`Starting job for ${req.url} runing each ${req.options.hitTime} minute`)
+        // return executeSiteRequests(req)
+        
         return schedule(() => {
             return executeSiteRequests(req)
         },`*/${req.options.hitTime} * * * *` )
+        
         // },`*/15 * * * * *` ) // TODO: Remover
+
     }))
 }
     
 
 module.exports = initSchedulesRequests
-
-// module.exports = () => {
-    // executeSiteRequests()
-    // schedule(executeSiteRequests)
-// }
-

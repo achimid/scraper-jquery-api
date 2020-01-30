@@ -12,4 +12,5 @@ Criar um gerenciamento de usuario e contas
     Possivel informar o login e senha do gmail de disparo de e-mail
         Fazer um tratamaento para quando da erro nas integrações
 
-implementar proxy
+Implementar esquema de proxy randomico
+Fazer documentação da api no README.md
