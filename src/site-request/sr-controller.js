@@ -11,11 +11,10 @@ const createRequest = (req, res) => {
         .catch(error => res.send(error))
 }
 
-const updateRequest = (req, res) => {
-    console.log(req)
-    update(req.params.id. req.body)
-        .then(() => res.status(HttpStatus.CREATED))
-        .catch(() => res.status(HttpStatus.CREATED))
+const updateRequest = (req, res) => {    
+    return update(req.params.id, req.body)
+        .then(() => res.status(HttpStatus.CREATED).send())
+        .catch(error => res.send(error))
 }
 
 module.exports = (prefix) => (app) => {    
